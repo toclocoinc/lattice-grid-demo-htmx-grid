@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>htmx Data Grid from a Server-Rendered Table | Lattice Grid</title>
+<meta name="description" content="An htmx data grid built from a server-rendered table: edit cells and post them with hx-post, swap teams with hx-get, and keep the sort when you press Back.">
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@toclocoinc/lattice-grid@1.97.0/lattice-grid.min.css">
+<link rel="stylesheet" href="styles.css">
+<!-- The grid comes from the published package. To use a newer release, change the version in these lines. -->
+<script type="importmap">
+{ "imports": {
+  "@toclocoinc/lattice-grid/modules/htmx": "https://cdn.jsdelivr.net/npm/@toclocoinc/lattice-grid@1.97.0/modules/htmx.esm.min.js" } }
+</script>
+</head>
+<body>
+<header>
+  <h1>htmx data grid from a server-rendered table</h1>
+  <p class="lede">The server renders a plain task table for four teams; Lattice turns it into an editable, sortable data grid with no mount code, and htmx handles the swaps and the save. A stand-in server answers htmx's requests in your browser, so nothing leaves the page.</p>
+  <p class="links"><a href="https://github.com/toclocoinc/lattice-grid-demo-htmx-grid">Code on GitHub</a>
+  <a href="https://www.latticegrid.dev/htmx/">Lattice Grid with htmx</a></p>
+</header>
+<main class="showcase">
+  <div class="demo">
+    <div id="htmx-history" hx-history-elt>
+      <div id="grid-view"><div class="view"><div class="filters"><button hx-get="/htmx-demo/grid/tasks?team=" hx-target="#grid-view"
+      hx-push-url="?team=" aria-pressed="true">All teams</button>
+  <button hx-get="/htmx-demo/grid/tasks?team=Growth" hx-target="#grid-view"
+      hx-push-url="?team=Growth" aria-pressed="false">Growth</button>
+  <button hx-get="/htmx-demo/grid/tasks?team=Platform" hx-target="#grid-view"
+      hx-push-url="?team=Platform" aria-pressed="false">Platform</button>
+  <button hx-get="/htmx-demo/grid/tasks?team=Design" hx-target="#grid-view"
+      hx-push-url="?team=Design" aria-pressed="false">Design</button>
+  <button hx-get="/htmx-demo/grid/tasks?team=Support" hx-target="#grid-view"
+      hx-push-url="?team=Support" aria-pressed="false">Support</button></div>
+<div hx-post="/htmx-demo/grid/save" hx-trigger="lattice:grid-change"
+  hx-vals='js:{key: event.detail.key, field: event.detail.field, value: event.detail.newValue}'
+  hx-target="#save-log" hx-swap="afterbegin">
+<table id="tasks" data-lattice-grid>
+  <thead><tr><th data-field="id">Ref</th><th data-field="title" data-edit>Task</th><th data-field="owner" data-edit>Owner</th>
+    <th data-field="status" data-edit>Status</th><th data-field="points" data-type="number" data-edit>Points</th></tr></thead>
+  <tbody>
+  <tr data-lattice-row="T-101"><td>T-101</td><td>Audit the checkout funnel</td><td>Ana Lopez</td><td>Done</td><td>5</td></tr>
+  <tr data-lattice-row="T-102"><td>T-102</td><td>Redesign the pricing table</td><td>Dev Patel</td><td>Doing</td><td>8</td></tr>
+  <tr data-lattice-row="T-103"><td>T-103</td><td>Write the launch email</td><td>Chloe Marsh</td><td>Doing</td><td>3</td></tr>
+  <tr data-lattice-row="T-104"><td>T-104</td><td>Set up the A/B test</td><td>Ben Okafor</td><td>Todo</td><td>5</td></tr>
+  <tr data-lattice-row="T-105"><td>T-105</td><td>Landing page for the webinar</td><td>Eva Lindqvist</td><td>Todo</td><td>8</td></tr>
+  <tr data-lattice-row="T-106"><td>T-106</td><td>Segment the trial users</td><td>Ana Lopez</td><td>Done</td><td>3</td></tr>
+  <tr data-lattice-row="T-107"><td>T-107</td><td>Referral programme copy</td><td>Chloe Marsh</td><td>Todo</td><td>2</td></tr>
+  <tr data-lattice-row="T-108"><td>T-108</td><td>Fix the sign-up drop-off on mobile</td><td>Dev Patel</td><td>Doing</td><td>5</td></tr>
+  <tr data-lattice-row="T-109"><td>T-109</td><td>Case study: logistics customer</td><td>Eva Lindqvist</td><td>Todo</td><td>5</td></tr>
+  <tr data-lattice-row="T-110"><td>T-110</td><td>Onboarding checklist emails</td><td>Ana Lopez</td><td>Doing</td><td>5</td></tr>
+  <tr data-lattice-row="T-111"><td>T-111</td><td>Track demo requests by source</td><td>Ben Okafor</td><td>Done</td><td>2</td></tr>
+  <tr data-lattice-row="T-112"><td>T-112</td><td>Quarterly pricing review</td><td>Dev Patel</td><td>Todo</td><td>13</td></tr>
+  <tr data-lattice-row="T-201"><td>T-201</td><td>Move billing to the new ledger</td><td>Ben Okafor</td><td>Doing</td><td>13</td></tr>
+  <tr data-lattice-row="T-202"><td>T-202</td><td>Rotate the API keys</td><td>Eva Lindqvist</td><td>Done</td><td>2</td></tr>
+  <tr data-lattice-row="T-203"><td>T-203</td><td>Cache the pricing lookups</td><td>Femi Adeyemi</td><td>Doing</td><td>5</td></tr>
+  <tr data-lattice-row="T-204"><td>T-204</td><td>Retire the v1 webhooks</td><td>Chloe Marsh</td><td>Todo</td><td>8</td></tr>
+  <tr data-lattice-row="T-205"><td>T-205</td><td>Database failover drill</td><td>Dev Patel</td><td>Todo</td><td>2</td></tr>
+  <tr data-lattice-row="T-206"><td>T-206</td><td>Upgrade the job queue workers</td><td>Femi Adeyemi</td><td>Doing</td><td>8</td></tr>
+  <tr data-lattice-row="T-207"><td>T-207</td><td>Rate limits for the public API</td><td>Ben Okafor</td><td>Todo</td><td>5</td></tr>
+  <tr data-lattice-row="T-208"><td>T-208</td><td>Add tracing to the export service</td><td>Hana Sato</td><td>Done</td><td>3</td></tr>
+  <tr data-lattice-row="T-209"><td>T-209</td><td>Archive audit logs after 13 months</td><td>Eva Lindqvist</td><td>Todo</td><td>5</td></tr>
+  <tr data-lattice-row="T-210"><td>T-210</td><td>Split the reporting database</td><td>Femi Adeyemi</td><td>Todo</td><td>13</td></tr>
+  <tr data-lattice-row="T-211"><td>T-211</td><td>Fix flaky invoice tests</td><td>Hana Sato</td><td>Doing</td><td>3</td></tr>
+  <tr data-lattice-row="T-212"><td>T-212</td><td>Single sign-on for enterprise accounts</td><td>Ben Okafor</td><td>Doing</td><td>13</td></tr>
+  <tr data-lattice-row="T-301"><td>T-301</td><td>Refresh the icon set</td><td>Grace Whitfield</td><td>Doing</td><td>5</td></tr>
+  <tr data-lattice-row="T-302"><td>T-302</td><td>Dark theme for the dashboard</td><td>Grace Whitfield</td><td>Todo</td><td>8</td></tr>
+  <tr data-lattice-row="T-303"><td>T-303</td><td>Empty states for the reports page</td><td>Ivan Petrov</td><td>Done</td><td>3</td></tr>
+  <tr data-lattice-row="T-304"><td>T-304</td><td>Usability test: new onboarding</td><td>Ivan Petrov</td><td>Doing</td><td>5</td></tr>
+  <tr data-lattice-row="T-305"><td>T-305</td><td>Accessibility pass on forms</td><td>Chloe Marsh</td><td>Todo</td><td>8</td></tr>
+  <tr data-lattice-row="T-306"><td>T-306</td><td>Design tokens handover</td><td>Grace Whitfield</td><td>Done</td><td>2</td></tr>
+  <tr data-lattice-row="T-307"><td>T-307</td><td>Pricing page mock-ups</td><td>Ivan Petrov</td><td>Done</td><td>5</td></tr>
+  <tr data-lattice-row="T-308"><td>T-308</td><td>Illustrations for the help centre</td><td>Jun Takeda</td><td>Todo</td><td>8</td></tr>
+  <tr data-lattice-row="T-309"><td>T-309</td><td>Mobile navigation prototype</td><td>Jun Takeda</td><td>Doing</td><td>5</td></tr>
+  <tr data-lattice-row="T-310"><td>T-310</td><td>Review the email templates</td><td>Chloe Marsh</td><td>Todo</td><td>3</td></tr>
+  <tr data-lattice-row="T-311"><td>T-311</td><td>Component library audit</td><td>Grace Whitfield</td><td>Todo</td><td>5</td></tr>
+  <tr data-lattice-row="T-312"><td>T-312</td><td>Motion guidelines</td><td>Jun Takeda</td><td>Todo</td><td>2</td></tr>
+  <tr data-lattice-row="T-401"><td>T-401</td><td>Answer the backlog of tickets older than a week</td><td>Kofi Mensah</td><td>Doing</td><td>8</td></tr>
+  <tr data-lattice-row="T-402"><td>T-402</td><td>Write the refund policy macro</td><td>Lena Fischer</td><td>Done</td><td>2</td></tr>
+  <tr data-lattice-row="T-403"><td>T-403</td><td>Tag tickets by product area</td><td>Kofi Mensah</td><td>Doing</td><td>3</td></tr>
+  <tr data-lattice-row="T-404"><td>T-404</td><td>Translate the help centre to German</td><td>Lena Fischer</td><td>Todo</td><td>13</td></tr>
+  <tr data-lattice-row="T-405"><td>T-405</td><td>Escalation path for outages</td><td>Hana Sato</td><td>Done</td><td>3</td></tr>
+  <tr data-lattice-row="T-406"><td>T-406</td><td>Weekly customer feedback digest</td><td>Kofi Mensah</td><td>Todo</td><td>2</td></tr>
+  <tr data-lattice-row="T-407"><td>T-407</td><td>Train the new starters on billing</td><td>Lena Fischer</td><td>Doing</td><td>5</td></tr>
+  <tr data-lattice-row="T-408"><td>T-408</td><td>Chat widget opening hours</td><td>Ana Lopez</td><td>Todo</td><td>2</td></tr>
+  <tr data-lattice-row="T-409"><td>T-409</td><td>Clean up the knowledge base</td><td>Kofi Mensah</td><td>Todo</td><td>8</td></tr>
+  <tr data-lattice-row="T-410"><td>T-410</td><td>Survey after resolved tickets</td><td>Lena Fischer</td><td>Todo</td><td>5</td></tr>
+  <tr data-lattice-row="T-411"><td>T-411</td><td>Status page templates</td><td>Hana Sato</td><td>Done</td><td>2</td></tr>
+  <tr data-lattice-row="T-412"><td>T-412</td><td>Shadow sessions with customers</td><td>Femi Adeyemi</td><td>Todo</td><td>3</td></tr>
+  </tbody>
+</table>
+</div></div></div>
+      <h3 class="saved-head">Saved by the server</h3>
+      <ul id="save-log" class="saved" aria-live="polite"></ul>
+    </div>
+  </div>
+  <aside>
+    <h2>Try the five steps</h2>
+    <ol class="steps">
+      <li><strong>Built on load.</strong> The task list was a server-rendered table; the grid replaced it on load, with the Task, Owner, Status and Points columns editable.</li>
+      <li><strong>Edit.</strong> Double-click a cell, change it and press Enter. lattice:grid-change is posted with hx-post and the server confirms below the grid.</li>
+      <li><strong>Sort.</strong> Click the Points header to sort. The sort is view state, kept by the grid and saved with the history snapshot.</li>
+      <li><strong>Swap.</strong> Pick a team. hx-get fetches its tasks, the old grid is torn down and a new one is built.</li>
+      <li><strong>Back.</strong> Press the browser Back button. The earlier team and the sort return, with the grid drawn once.</li>
+    </ol>
+    <h3>Requests the stand-in server answered</h3>
+    <ul id="request-log" class="log" aria-live="polite"><li>none yet</li></ul>
+  </aside>
+</main>
+<footer>Built with <a href="https://www.latticegrid.dev/htmx/">Lattice Grid</a>. No keys, no analytics.</footer>
+<script type="module" src="main.js"></script>
+</body>
+</html>

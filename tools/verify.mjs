@@ -43,16 +43,16 @@ try {
   const long = await page.evaluate(() => {
     const full = 'Fix the sign-up drop-off on mobile Safari when the password manager fills the form';
     const c = [...document.querySelectorAll('#grid-view [role=gridcell]')].find((e) => e.textContent === full);
-    const cs = getComputedStyle(c);
-    return { full, clipped: c.scrollWidth > c.clientWidth, textOverflow: cs.textOverflow, overflow: cs.overflow, display: cs.display, title: c.getAttribute('title') };
+    const t = c.querySelector('.lat-cell-text');
+    const cs = getComputedStyle(t);
+    return { full, clipped: t.scrollWidth > t.clientWidth, textOverflow: cs.textOverflow, overflow: cs.overflow, whiteSpace: cs.whiteSpace, title: c.getAttribute('title') };
   });
-  check(long.clipped && long.textOverflow === 'ellipsis' && long.overflow === 'hidden', `long title: clipped with text-overflow ellipsis (${JSON.stringify(long)})`);
+  check(long.clipped && long.textOverflow === 'ellipsis' && long.overflow === 'hidden' && long.whiteSpace === 'nowrap', `long title: text element overflows and draws an ellipsis (${JSON.stringify(long)})`);
   const snap = await page.accessibility.snapshot({ interestingOnly: false });
   const named = (n) => (n.role === 'gridcell' && n.name === long.full) || (n.children || []).some(named);
   check(named(snap), 'long title: the full text is the cell accessible name');
-  // The ellipsis is drawn only when the cell is not a flex container around bare text, and a title tooltip needs the attribute.
-  const drawn = long.display !== 'flex' || long.title === long.full;
-  console.log(`${drawn ? 'ok  ' : 'NOTE'} long title: ellipsis drawn or full text in title (cell display ${long.display}, title ${long.title})`);
+  // The cell's full value must also be in its title attribute (tooltip).
+  check(long.title === long.full, `long title: title attribute carries the full value (${long.title})`);
 
   // Out-of-band: one row (the sixth of the view) is patched by value, nothing else changes.
   await page.evaluate(() => { document.querySelector('#grid-view [role=grid]').dataset.probe = 'same'; });

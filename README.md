@@ -4,17 +4,18 @@
 
 The server renders a plain `<table data-lattice-grid>` of tasks. [Lattice Grid](https://www.latticegrid.dev/htmx/) turns it into an editable, sortable data grid with no mount code on the page: only markup, [htmx](https://htmx.org/) and the Lattice htmx module.
 
-The data is a sprint board of 48 tasks across four teams (Growth, Platform, Design and Support). The page shows five things:
+The data is a sprint board of 48 tasks across four teams (Growth, Platform, Design and Support). The page shows six things:
 
 1. **Built on load.** The server-rendered task table becomes the grid. With JavaScript off it is still a readable table.
 2. **Edit.** `data-edit` on a column header makes it editable. A committed cell edit is re-raised as `lattice:grid-change` with the row key, the field and the new value; `hx-trigger="lattice:grid-change"` posts it with `hx-post`, and the server's reply appears under the grid.
 3. **Sort.** Clicking the Points header sorts the grid. The sort is view state, kept by the grid and saved with htmx's history snapshot.
 4. **Swap.** Picking a team runs an `hx-get`; the old grid is torn down and a new one is built from the new table.
-5. **Back.** Pressing Back restores the earlier team and its sort, with the grid drawn once.
+5. **Update.** The "A teammate updates a task" button runs an `hx-get` with `hx-swap="none"`. The server replies with one `<tr hx-swap-oob="true">` for the sixth task of the current view, and that row is patched in place: the rest of the grid, the sort and the scroll position stay as they are.
+6. **Back.** Pressing Back restores the earlier team and its sort, with the grid drawn once.
 
 ## The stand-in server
 
-GitHub Pages is static, so `src/mock-server.js` answers htmx's requests to `/htmx-demo/` in the browser, from the route handlers in `src/server.js`, after a short delay so each swap is visible. Nothing leaves the page. Those handlers are exactly what a real server would do: return a team's table as HTML for `GET /htmx-demo/grid/tasks`, and store the edited cell and reply with a line of HTML for `POST /htmx-demo/grid/save`. Port them to your own backend (Django, Rails, Laravel, Go, anything that renders HTML) and delete the stand-in.
+GitHub Pages is static, so `src/mock-server.js` answers htmx's requests to `/htmx-demo/` in the browser, from the route handlers in `src/server.js`, after a short delay so each swap is visible. Nothing leaves the page. Those handlers are exactly what a real server would do: return a team's table as HTML for `GET /htmx-demo/grid/tasks`, return one changed row for `GET /htmx-demo/grid/teammate`, and store the edited cell and reply with a line of HTML for `POST /htmx-demo/grid/save`. Port them to your own backend (Django, Rails, Laravel, Go, anything that renders HTML) and delete the stand-in.
 
 ## Run it
 

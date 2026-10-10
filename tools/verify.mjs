@@ -1,5 +1,5 @@
-// Real-Chrome check of the five steps: built on load, an edit posted with hx-post,
-// a sort, a team swap, Back, and no console errors or [lattice] warnings.
+// Real-Chrome check of the six steps: built on load, an edit posted with hx-post,
+// an out-of-band row update, a sort, a team swap, Back, and no console errors or [lattice] warnings.
 //   npm run serve                    (in another terminal)
 //   CHROME=/usr/bin/google-chrome node tools/verify.mjs [http://localhost:8000/lattice-grid-demo-htmx-grid/ [width height]]
 import puppeteer from 'puppeteer-core';
@@ -7,7 +7,7 @@ import puppeteer from 'puppeteer-core';
 const url = process.argv[2] || 'http://localhost:8000/lattice-grid-demo-htmx-grid/';
 const [width, height] = [Number(process.argv[3] || 1440), Number(process.argv[4] || 900)];
 const sleep = (ms) => new Promise((r) => { setTimeout(r, ms); });
-const browser = await puppeteer.launch({ executablePath: process.env.CHROME || '/usr/bin/google-chrome', headless: true, args: ['--no-sandbox'] });
+const browser = await puppeteer.launch({ executablePath: process.env.CHROME || (process.platform === 'darwin' ? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' : '/usr/bin/google-chrome'), headless: true, args: ['--no-sandbox'] });
 let failed = 0;
 const check = (ok, what) => { if (!ok) failed += 1; console.log(`${ok ? 'ok  ' : 'FAIL'} ${what}`); };
 // The grid draws only the rows in view, so read the refs of the rows it has drawn.
@@ -23,6 +23,7 @@ try {
   await page.goto(url);
   await page.waitForFunction(() => document.querySelectorAll('#grid-view [role=row]').length > 3, { timeout: 30000 });
   await sleep(1000);
+  if (process.env.SHOTS) await page.screenshot({ path: `${process.env.SHOTS}-${width}-full.png`, fullPage: true });
   const fill = await page.evaluate(() => { const h = { width: document.querySelector('#tasks').clientWidth }; const c = [...document.querySelectorAll('#grid-view [role=columnheader]')].map((e) => e.getBoundingClientRect()); return { host: h.width, cols: Math.max(...c.map((r) => r.right)) - Math.min(...c.map((r) => r.left)) }; });
   check(Math.abs(fill.host - fill.cols) <= 4, `grid fills the host (host ${fill.host}px, columns ${fill.cols}px)`);
   check((await page.evaluate(text)).includes('Audit the checkout funnel'), 'built on load from the server task table');
@@ -37,6 +38,40 @@ try {
   await sleep(1200);
   if (process.env.SHOTS) await page.screenshot({ path: `${process.env.SHOTS}-${width}-edit.png` });
   check((await page.$eval('#save-log', (e) => e.textContent)).includes('T-101'), 'edit: the server confirmed the saved cell');
+
+  // Long titles: the cell clips the text, and the full text stays in the accessible name.
+  const long = await page.evaluate(() => {
+    const full = 'Fix the sign-up drop-off on mobile Safari when the password manager fills the form';
+    const c = [...document.querySelectorAll('#grid-view [role=gridcell]')].find((e) => e.textContent === full);
+    const cs = getComputedStyle(c);
+    return { full, clipped: c.scrollWidth > c.clientWidth, textOverflow: cs.textOverflow, overflow: cs.overflow, display: cs.display, title: c.getAttribute('title') };
+  });
+  check(long.clipped && long.textOverflow === 'ellipsis' && long.overflow === 'hidden', `long title: clipped with text-overflow ellipsis (${JSON.stringify(long)})`);
+  const snap = await page.accessibility.snapshot({ interestingOnly: false });
+  const named = (n) => (n.role === 'gridcell' && n.name === long.full) || (n.children || []).some(named);
+  check(named(snap), 'long title: the full text is the cell accessible name');
+  // The ellipsis is drawn only when the cell is not a flex container around bare text, and a title tooltip needs the attribute.
+  const drawn = long.display !== 'flex' || long.title === long.full;
+  console.log(`${drawn ? 'ok  ' : 'NOTE'} long title: ellipsis drawn or full text in title (cell display ${long.display}, title ${long.title})`);
+
+  // Out-of-band: one row (the sixth of the view) is patched by value, nothing else changes.
+  await page.evaluate(() => { document.querySelector('#grid-view [role=grid]').dataset.probe = 'same'; });
+  await page.click('button.action');
+  await sleep(1200);
+  const row6 = await page.evaluate(() => [...document.querySelectorAll('#grid-view [role=row]')].find((r) => r.textContent.startsWith('T-106'))?.textContent);
+  if (process.env.SHOTS) await page.screenshot({ path: `${process.env.SHOTS}-${width}-oob.png` });
+  check(row6 === 'T-106Segment the trial usersAna LopezGrowthTodo3', `out of band: row 6 patched by value (${row6})`);
+  const other = await page.evaluate(() => [...document.querySelectorAll('#grid-view [role=row]')].find((r) => r.textContent.startsWith('T-105'))?.textContent);
+  check(other === 'T-105Landing page for the webinarEva LindqvistGrowthTodo8', `out of band: another row untouched (${other})`);
+  const stray = await page.evaluate(() => {
+    const w = document.createTreeWalker(document.querySelector('#grid-view'), NodeFilter.SHOW_TEXT);
+    const out = [];
+    for (let n = w.nextNode(); n; n = w.nextNode()) if (n.textContent.trim() && !n.parentElement.closest('[role=grid]') && !n.parentElement.closest('.filters')) out.push(n.textContent.trim());
+    return out;
+  });
+  check(stray.length === 0, `out of band: no stray text under the grid (${stray.join(' / ')})`);
+  check(await page.evaluate(() => document.querySelectorAll('#grid-view [role=grid][data-probe=same]').length === 1), 'out of band: the same grid is kept, not rebuilt');
+  check((await page.$eval('#request-log', (e) => e.textContent)).includes('GET /htmx-demo/grid/teammate → 200'), 'out of band: the request log shows the request');
 
   await page.evaluate(() => [...document.querySelectorAll('#grid-view [role=columnheader]')].find((h) => h.textContent.includes('Points')).click());
   await sleep(500);

@@ -33,76 +33,79 @@
   <button hx-get="/htmx-demo/grid/tasks?team=Design" hx-target="#grid-view"
       hx-push-url="/lattice-grid-demo-htmx-grid/?team=Design" aria-pressed="false">Design</button>
   <button hx-get="/htmx-demo/grid/tasks?team=Support" hx-target="#grid-view"
-      hx-push-url="/lattice-grid-demo-htmx-grid/?team=Support" aria-pressed="false">Support</button></div>
+      hx-push-url="/lattice-grid-demo-htmx-grid/?team=Support" aria-pressed="false">Support</button>
+  <button class="action" hx-get="/htmx-demo/grid/teammate" hx-vals='{"team": ""}' hx-swap="none">A teammate updates a task</button></div>
 <div hx-post="/htmx-demo/grid/save" hx-trigger="lattice:grid-change"
   hx-vals='js:{key: event.detail.key, field: event.detail.field, value: event.detail.newValue}'
   hx-target="#save-log" hx-swap="afterbegin">
 <table id="tasks" data-lattice-grid>
-  <thead><tr><th data-field="id">Ref</th><th data-field="title" data-edit>Task</th><th data-field="owner" data-edit>Owner</th>
-    <th data-field="status" data-edit>Status</th><th data-field="points" data-type="number" data-edit>Points</th></tr></thead>
+  <thead><tr><th data-field="id" data-width="80">Ref</th><th data-field="title" data-edit data-width="440">Task</th>
+    <th data-field="owner" data-edit data-flex="1" data-min-width="150">Owner</th><th data-field="team" data-width="110">Team</th><th data-field="status" data-edit data-width="100">Status</th>
+    <th data-field="points" data-type="number" data-edit data-width="90">Points</th></tr></thead>
   <tbody>
-  <tr data-lattice-row="T-101"><td>T-101</td><td>Audit the checkout funnel</td><td>Ana Lopez</td><td>Done</td><td>5</td></tr>
-  <tr data-lattice-row="T-102"><td>T-102</td><td>Redesign the pricing table</td><td>Dev Patel</td><td>Doing</td><td>8</td></tr>
-  <tr data-lattice-row="T-103"><td>T-103</td><td>Write the launch email</td><td>Chloe Marsh</td><td>Doing</td><td>3</td></tr>
-  <tr data-lattice-row="T-104"><td>T-104</td><td>Set up the A/B test</td><td>Ben Okafor</td><td>Todo</td><td>5</td></tr>
-  <tr data-lattice-row="T-105"><td>T-105</td><td>Landing page for the webinar</td><td>Eva Lindqvist</td><td>Todo</td><td>8</td></tr>
-  <tr data-lattice-row="T-106"><td>T-106</td><td>Segment the trial users</td><td>Ana Lopez</td><td>Done</td><td>3</td></tr>
-  <tr data-lattice-row="T-107"><td>T-107</td><td>Referral programme copy</td><td>Chloe Marsh</td><td>Todo</td><td>2</td></tr>
-  <tr data-lattice-row="T-108"><td>T-108</td><td>Fix the sign-up drop-off on mobile</td><td>Dev Patel</td><td>Doing</td><td>5</td></tr>
-  <tr data-lattice-row="T-109"><td>T-109</td><td>Case study: logistics customer</td><td>Eva Lindqvist</td><td>Todo</td><td>5</td></tr>
-  <tr data-lattice-row="T-110"><td>T-110</td><td>Onboarding checklist emails</td><td>Ana Lopez</td><td>Doing</td><td>5</td></tr>
-  <tr data-lattice-row="T-111"><td>T-111</td><td>Track demo requests by source</td><td>Ben Okafor</td><td>Done</td><td>2</td></tr>
-  <tr data-lattice-row="T-112"><td>T-112</td><td>Quarterly pricing review</td><td>Dev Patel</td><td>Todo</td><td>13</td></tr>
-  <tr data-lattice-row="T-201"><td>T-201</td><td>Move billing to the new ledger</td><td>Ben Okafor</td><td>Doing</td><td>13</td></tr>
-  <tr data-lattice-row="T-202"><td>T-202</td><td>Rotate the API keys</td><td>Eva Lindqvist</td><td>Done</td><td>2</td></tr>
-  <tr data-lattice-row="T-203"><td>T-203</td><td>Cache the pricing lookups</td><td>Femi Adeyemi</td><td>Doing</td><td>5</td></tr>
-  <tr data-lattice-row="T-204"><td>T-204</td><td>Retire the v1 webhooks</td><td>Chloe Marsh</td><td>Todo</td><td>8</td></tr>
-  <tr data-lattice-row="T-205"><td>T-205</td><td>Database failover drill</td><td>Dev Patel</td><td>Todo</td><td>2</td></tr>
-  <tr data-lattice-row="T-206"><td>T-206</td><td>Upgrade the job queue workers</td><td>Femi Adeyemi</td><td>Doing</td><td>8</td></tr>
-  <tr data-lattice-row="T-207"><td>T-207</td><td>Rate limits for the public API</td><td>Ben Okafor</td><td>Todo</td><td>5</td></tr>
-  <tr data-lattice-row="T-208"><td>T-208</td><td>Add tracing to the export service</td><td>Hana Sato</td><td>Done</td><td>3</td></tr>
-  <tr data-lattice-row="T-209"><td>T-209</td><td>Archive audit logs after 13 months</td><td>Eva Lindqvist</td><td>Todo</td><td>5</td></tr>
-  <tr data-lattice-row="T-210"><td>T-210</td><td>Split the reporting database</td><td>Femi Adeyemi</td><td>Todo</td><td>13</td></tr>
-  <tr data-lattice-row="T-211"><td>T-211</td><td>Fix flaky invoice tests</td><td>Hana Sato</td><td>Doing</td><td>3</td></tr>
-  <tr data-lattice-row="T-212"><td>T-212</td><td>Single sign-on for enterprise accounts</td><td>Ben Okafor</td><td>Doing</td><td>13</td></tr>
-  <tr data-lattice-row="T-301"><td>T-301</td><td>Refresh the icon set</td><td>Grace Whitfield</td><td>Doing</td><td>5</td></tr>
-  <tr data-lattice-row="T-302"><td>T-302</td><td>Dark theme for the dashboard</td><td>Grace Whitfield</td><td>Todo</td><td>8</td></tr>
-  <tr data-lattice-row="T-303"><td>T-303</td><td>Empty states for the reports page</td><td>Ivan Petrov</td><td>Done</td><td>3</td></tr>
-  <tr data-lattice-row="T-304"><td>T-304</td><td>Usability test: new onboarding</td><td>Ivan Petrov</td><td>Doing</td><td>5</td></tr>
-  <tr data-lattice-row="T-305"><td>T-305</td><td>Accessibility pass on forms</td><td>Chloe Marsh</td><td>Todo</td><td>8</td></tr>
-  <tr data-lattice-row="T-306"><td>T-306</td><td>Design tokens handover</td><td>Grace Whitfield</td><td>Done</td><td>2</td></tr>
-  <tr data-lattice-row="T-307"><td>T-307</td><td>Pricing page mock-ups</td><td>Ivan Petrov</td><td>Done</td><td>5</td></tr>
-  <tr data-lattice-row="T-308"><td>T-308</td><td>Illustrations for the help centre</td><td>Jun Takeda</td><td>Todo</td><td>8</td></tr>
-  <tr data-lattice-row="T-309"><td>T-309</td><td>Mobile navigation prototype</td><td>Jun Takeda</td><td>Doing</td><td>5</td></tr>
-  <tr data-lattice-row="T-310"><td>T-310</td><td>Review the email templates</td><td>Chloe Marsh</td><td>Todo</td><td>3</td></tr>
-  <tr data-lattice-row="T-311"><td>T-311</td><td>Component library audit</td><td>Grace Whitfield</td><td>Todo</td><td>5</td></tr>
-  <tr data-lattice-row="T-312"><td>T-312</td><td>Motion guidelines</td><td>Jun Takeda</td><td>Todo</td><td>2</td></tr>
-  <tr data-lattice-row="T-401"><td>T-401</td><td>Answer the backlog of tickets older than a week</td><td>Kofi Mensah</td><td>Doing</td><td>8</td></tr>
-  <tr data-lattice-row="T-402"><td>T-402</td><td>Write the refund policy macro</td><td>Lena Fischer</td><td>Done</td><td>2</td></tr>
-  <tr data-lattice-row="T-403"><td>T-403</td><td>Tag tickets by product area</td><td>Kofi Mensah</td><td>Doing</td><td>3</td></tr>
-  <tr data-lattice-row="T-404"><td>T-404</td><td>Translate the help centre to German</td><td>Lena Fischer</td><td>Todo</td><td>13</td></tr>
-  <tr data-lattice-row="T-405"><td>T-405</td><td>Escalation path for outages</td><td>Hana Sato</td><td>Done</td><td>3</td></tr>
-  <tr data-lattice-row="T-406"><td>T-406</td><td>Weekly customer feedback digest</td><td>Kofi Mensah</td><td>Todo</td><td>2</td></tr>
-  <tr data-lattice-row="T-407"><td>T-407</td><td>Train the new starters on billing</td><td>Lena Fischer</td><td>Doing</td><td>5</td></tr>
-  <tr data-lattice-row="T-408"><td>T-408</td><td>Chat widget opening hours</td><td>Ana Lopez</td><td>Todo</td><td>2</td></tr>
-  <tr data-lattice-row="T-409"><td>T-409</td><td>Clean up the knowledge base</td><td>Kofi Mensah</td><td>Todo</td><td>8</td></tr>
-  <tr data-lattice-row="T-410"><td>T-410</td><td>Survey after resolved tickets</td><td>Lena Fischer</td><td>Todo</td><td>5</td></tr>
-  <tr data-lattice-row="T-411"><td>T-411</td><td>Status page templates</td><td>Hana Sato</td><td>Done</td><td>2</td></tr>
-  <tr data-lattice-row="T-412"><td>T-412</td><td>Shadow sessions with customers</td><td>Femi Adeyemi</td><td>Todo</td><td>3</td></tr>
+  <tr data-lattice-row="T-101"0><td>T-101</td><td>Audit the checkout funnel</td><td>Ana Lopez</td><td>Growth</td><td>Done</td><td>5</td></tr>
+  <tr data-lattice-row="T-102"1><td>T-102</td><td>Redesign the pricing table</td><td>Dev Patel</td><td>Growth</td><td>Doing</td><td>8</td></tr>
+  <tr data-lattice-row="T-103"2><td>T-103</td><td>Write the launch email</td><td>Chloe Marsh</td><td>Growth</td><td>Doing</td><td>3</td></tr>
+  <tr data-lattice-row="T-104"3><td>T-104</td><td>Set up the A/B test</td><td>Ben Okafor</td><td>Growth</td><td>Todo</td><td>5</td></tr>
+  <tr data-lattice-row="T-105"4><td>T-105</td><td>Landing page for the webinar</td><td>Eva Lindqvist</td><td>Growth</td><td>Todo</td><td>8</td></tr>
+  <tr data-lattice-row="T-106"5><td>T-106</td><td>Segment the trial users</td><td>Ana Lopez</td><td>Growth</td><td>Done</td><td>3</td></tr>
+  <tr data-lattice-row="T-107"6><td>T-107</td><td>Referral programme copy</td><td>Chloe Marsh</td><td>Growth</td><td>Todo</td><td>2</td></tr>
+  <tr data-lattice-row="T-108"7><td>T-108</td><td>Fix the sign-up drop-off on mobile Safari when the password manager fills the form</td><td>Dev Patel</td><td>Growth</td><td>Doing</td><td>5</td></tr>
+  <tr data-lattice-row="T-109"8><td>T-109</td><td>Case study: logistics customer</td><td>Eva Lindqvist</td><td>Growth</td><td>Todo</td><td>5</td></tr>
+  <tr data-lattice-row="T-110"9><td>T-110</td><td>Onboarding checklist emails</td><td>Ana Lopez</td><td>Growth</td><td>Doing</td><td>5</td></tr>
+  <tr data-lattice-row="T-111"10><td>T-111</td><td>Track demo requests by source</td><td>Ben Okafor</td><td>Growth</td><td>Done</td><td>2</td></tr>
+  <tr data-lattice-row="T-112"11><td>T-112</td><td>Quarterly pricing review</td><td>Dev Patel</td><td>Growth</td><td>Todo</td><td>13</td></tr>
+  <tr data-lattice-row="T-201"12><td>T-201</td><td>Move billing to the new ledger</td><td>Ben Okafor</td><td>Platform</td><td>Doing</td><td>13</td></tr>
+  <tr data-lattice-row="T-202"13><td>T-202</td><td>Rotate the API keys</td><td>Eva Lindqvist</td><td>Platform</td><td>Done</td><td>2</td></tr>
+  <tr data-lattice-row="T-203"14><td>T-203</td><td>Cache the pricing lookups</td><td>Femi Adeyemi</td><td>Platform</td><td>Doing</td><td>5</td></tr>
+  <tr data-lattice-row="T-204"15><td>T-204</td><td>Retire the v1 webhooks</td><td>Chloe Marsh</td><td>Platform</td><td>Todo</td><td>8</td></tr>
+  <tr data-lattice-row="T-205"16><td>T-205</td><td>Database failover drill</td><td>Dev Patel</td><td>Platform</td><td>Todo</td><td>2</td></tr>
+  <tr data-lattice-row="T-206"17><td>T-206</td><td>Upgrade the job queue workers</td><td>Femi Adeyemi</td><td>Platform</td><td>Doing</td><td>8</td></tr>
+  <tr data-lattice-row="T-207"18><td>T-207</td><td>Rate limits for the public API</td><td>Ben Okafor</td><td>Platform</td><td>Todo</td><td>5</td></tr>
+  <tr data-lattice-row="T-208"19><td>T-208</td><td>Add tracing to the export service</td><td>Hana Sato</td><td>Platform</td><td>Done</td><td>3</td></tr>
+  <tr data-lattice-row="T-209"20><td>T-209</td><td>Archive audit logs after 13 months</td><td>Eva Lindqvist</td><td>Platform</td><td>Todo</td><td>5</td></tr>
+  <tr data-lattice-row="T-210"21><td>T-210</td><td>Split the reporting database</td><td>Femi Adeyemi</td><td>Platform</td><td>Todo</td><td>13</td></tr>
+  <tr data-lattice-row="T-211"22><td>T-211</td><td>Fix flaky invoice tests</td><td>Hana Sato</td><td>Platform</td><td>Doing</td><td>3</td></tr>
+  <tr data-lattice-row="T-212"23><td>T-212</td><td>Single sign-on for enterprise accounts with SAML and SCIM provisioning</td><td>Ben Okafor</td><td>Platform</td><td>Doing</td><td>13</td></tr>
+  <tr data-lattice-row="T-301"24><td>T-301</td><td>Refresh the icon set</td><td>Grace Whitfield</td><td>Design</td><td>Doing</td><td>5</td></tr>
+  <tr data-lattice-row="T-302"25><td>T-302</td><td>Dark theme for the dashboard</td><td>Grace Whitfield</td><td>Design</td><td>Todo</td><td>8</td></tr>
+  <tr data-lattice-row="T-303"26><td>T-303</td><td>Empty states for the reports page</td><td>Ivan Petrov</td><td>Design</td><td>Done</td><td>3</td></tr>
+  <tr data-lattice-row="T-304"27><td>T-304</td><td>Usability test: new onboarding</td><td>Ivan Petrov</td><td>Design</td><td>Doing</td><td>5</td></tr>
+  <tr data-lattice-row="T-305"28><td>T-305</td><td>Accessibility pass on forms: labels, error messages and keyboard order</td><td>Chloe Marsh</td><td>Design</td><td>Todo</td><td>8</td></tr>
+  <tr data-lattice-row="T-306"29><td>T-306</td><td>Design tokens handover</td><td>Grace Whitfield</td><td>Design</td><td>Done</td><td>2</td></tr>
+  <tr data-lattice-row="T-307"30><td>T-307</td><td>Pricing page mock-ups</td><td>Ivan Petrov</td><td>Design</td><td>Done</td><td>5</td></tr>
+  <tr data-lattice-row="T-308"31><td>T-308</td><td>Illustrations for the help centre</td><td>Jun Takeda</td><td>Design</td><td>Todo</td><td>8</td></tr>
+  <tr data-lattice-row="T-309"32><td>T-309</td><td>Mobile navigation prototype</td><td>Jun Takeda</td><td>Design</td><td>Doing</td><td>5</td></tr>
+  <tr data-lattice-row="T-310"33><td>T-310</td><td>Review the email templates</td><td>Chloe Marsh</td><td>Design</td><td>Todo</td><td>3</td></tr>
+  <tr data-lattice-row="T-311"34><td>T-311</td><td>Component library audit</td><td>Grace Whitfield</td><td>Design</td><td>Todo</td><td>5</td></tr>
+  <tr data-lattice-row="T-312"35><td>T-312</td><td>Motion guidelines</td><td>Jun Takeda</td><td>Design</td><td>Todo</td><td>2</td></tr>
+  <tr data-lattice-row="T-401"36><td>T-401</td><td>Answer the backlog of support tickets that have been open for longer than a week</td><td>Kofi Mensah</td><td>Support</td><td>Doing</td><td>8</td></tr>
+  <tr data-lattice-row="T-402"37><td>T-402</td><td>Write the refund policy macro</td><td>Lena Fischer</td><td>Support</td><td>Done</td><td>2</td></tr>
+  <tr data-lattice-row="T-403"38><td>T-403</td><td>Tag tickets by product area</td><td>Kofi Mensah</td><td>Support</td><td>Doing</td><td>3</td></tr>
+  <tr data-lattice-row="T-404"39><td>T-404</td><td>Translate the help centre to German</td><td>Lena Fischer</td><td>Support</td><td>Todo</td><td>13</td></tr>
+  <tr data-lattice-row="T-405"40><td>T-405</td><td>Escalation path for outages</td><td>Hana Sato</td><td>Support</td><td>Done</td><td>3</td></tr>
+  <tr data-lattice-row="T-406"41><td>T-406</td><td>Weekly customer feedback digest</td><td>Kofi Mensah</td><td>Support</td><td>Todo</td><td>2</td></tr>
+  <tr data-lattice-row="T-407"42><td>T-407</td><td>Train the new starters on billing</td><td>Lena Fischer</td><td>Support</td><td>Doing</td><td>5</td></tr>
+  <tr data-lattice-row="T-408"43><td>T-408</td><td>Chat widget opening hours</td><td>Ana Lopez</td><td>Support</td><td>Todo</td><td>2</td></tr>
+  <tr data-lattice-row="T-409"44><td>T-409</td><td>Clean up the knowledge base</td><td>Kofi Mensah</td><td>Support</td><td>Todo</td><td>8</td></tr>
+  <tr data-lattice-row="T-410"45><td>T-410</td><td>Survey after resolved tickets</td><td>Lena Fischer</td><td>Support</td><td>Todo</td><td>5</td></tr>
+  <tr data-lattice-row="T-411"46><td>T-411</td><td>Status page templates</td><td>Hana Sato</td><td>Support</td><td>Done</td><td>2</td></tr>
+  <tr data-lattice-row="T-412"47><td>T-412</td><td>Shadow sessions with customers</td><td>Femi Adeyemi</td><td>Support</td><td>Todo</td><td>3</td></tr>
   </tbody>
-</table>
+</table><i id="task-T-101" data-lattice-row="T-101"></i><i id="task-T-102" data-lattice-row="T-102"></i><i id="task-T-103" data-lattice-row="T-103"></i><i id="task-T-104" data-lattice-row="T-104"></i><i id="task-T-105" data-lattice-row="T-105"></i><i id="task-T-106" data-lattice-row="T-106"></i><i id="task-T-107" data-lattice-row="T-107"></i><i id="task-T-108" data-lattice-row="T-108"></i><i id="task-T-109" data-lattice-row="T-109"></i><i id="task-T-110" data-lattice-row="T-110"></i><i id="task-T-111" data-lattice-row="T-111"></i><i id="task-T-112" data-lattice-row="T-112"></i><i id="task-T-201" data-lattice-row="T-201"></i><i id="task-T-202" data-lattice-row="T-202"></i><i id="task-T-203" data-lattice-row="T-203"></i><i id="task-T-204" data-lattice-row="T-204"></i><i id="task-T-205" data-lattice-row="T-205"></i><i id="task-T-206" data-lattice-row="T-206"></i><i id="task-T-207" data-lattice-row="T-207"></i><i id="task-T-208" data-lattice-row="T-208"></i><i id="task-T-209" data-lattice-row="T-209"></i><i id="task-T-210" data-lattice-row="T-210"></i><i id="task-T-211" data-lattice-row="T-211"></i><i id="task-T-212" data-lattice-row="T-212"></i><i id="task-T-301" data-lattice-row="T-301"></i><i id="task-T-302" data-lattice-row="T-302"></i><i id="task-T-303" data-lattice-row="T-303"></i><i id="task-T-304" data-lattice-row="T-304"></i><i id="task-T-305" data-lattice-row="T-305"></i><i id="task-T-306" data-lattice-row="T-306"></i><i id="task-T-307" data-lattice-row="T-307"></i><i id="task-T-308" data-lattice-row="T-308"></i><i id="task-T-309" data-lattice-row="T-309"></i><i id="task-T-310" data-lattice-row="T-310"></i><i id="task-T-311" data-lattice-row="T-311"></i><i id="task-T-312" data-lattice-row="T-312"></i><i id="task-T-401" data-lattice-row="T-401"></i><i id="task-T-402" data-lattice-row="T-402"></i><i id="task-T-403" data-lattice-row="T-403"></i><i id="task-T-404" data-lattice-row="T-404"></i><i id="task-T-405" data-lattice-row="T-405"></i><i id="task-T-406" data-lattice-row="T-406"></i><i id="task-T-407" data-lattice-row="T-407"></i><i id="task-T-408" data-lattice-row="T-408"></i><i id="task-T-409" data-lattice-row="T-409"></i><i id="task-T-410" data-lattice-row="T-410"></i><i id="task-T-411" data-lattice-row="T-411"></i><i id="task-T-412" data-lattice-row="T-412"></i>
 </div></div></div>
       <h3 class="saved-head">Saved by the server</h3>
       <ul id="save-log" class="saved" aria-live="polite"></ul>
     </div>
   </div>
   <aside>
-    <h2>Try the five steps</h2>
+    <h2>Try the six steps</h2>
     <ol class="steps">
       <li><strong>Built on load.</strong> The task list was a server-rendered table; the grid replaced it on load, with the Task, Owner, Status and Points columns editable.</li>
       <li><strong>Edit.</strong> Double-click a cell, change it and press Enter. lattice:grid-change is posted with hx-post and the server confirms below the grid.</li>
       <li><strong>Sort.</strong> Click the Points header to sort. The sort is view state, kept by the grid and saved with the history snapshot.</li>
       <li><strong>Swap.</strong> Pick a team. hx-get fetches its tasks, the old grid is torn down and a new one is built.</li>
+      <li><strong>Update.</strong> Press “A teammate updates a task”. The server answers with one row marked hx-swap-oob, and that row, the sixth in the view, changes in place while the rest of the grid stays as it is.</li>
       <li><strong>Back.</strong> Press the browser Back button. The earlier team and the sort return, with the grid drawn once.</li>
     </ol>
     <h3>Requests the stand-in server answered</h3>

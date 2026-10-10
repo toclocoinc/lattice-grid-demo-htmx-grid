@@ -10,7 +10,7 @@ const tasks = [
   ['T-105', 'Landing page for the webinar', 'Eva Lindqvist', 'Growth', 'Todo', 8],
   ['T-106', 'Segment the trial users', 'Ana Lopez', 'Growth', 'Done', 3],
   ['T-107', 'Referral programme copy', 'Chloe Marsh', 'Growth', 'Todo', 2],
-  ['T-108', 'Fix the sign-up drop-off on mobile', 'Dev Patel', 'Growth', 'Doing', 5],
+  ['T-108', 'Fix the sign-up drop-off on mobile Safari when the password manager fills the form', 'Dev Patel', 'Growth', 'Doing', 5],
   ['T-109', 'Case study: logistics customer', 'Eva Lindqvist', 'Growth', 'Todo', 5],
   ['T-110', 'Onboarding checklist emails', 'Ana Lopez', 'Growth', 'Doing', 5],
   ['T-111', 'Track demo requests by source', 'Ben Okafor', 'Growth', 'Done', 2],
@@ -26,12 +26,12 @@ const tasks = [
   ['T-209', 'Archive audit logs after 13 months', 'Eva Lindqvist', 'Platform', 'Todo', 5],
   ['T-210', 'Split the reporting database', 'Femi Adeyemi', 'Platform', 'Todo', 13],
   ['T-211', 'Fix flaky invoice tests', 'Hana Sato', 'Platform', 'Doing', 3],
-  ['T-212', 'Single sign-on for enterprise accounts', 'Ben Okafor', 'Platform', 'Doing', 13],
+  ['T-212', 'Single sign-on for enterprise accounts with SAML and SCIM provisioning', 'Ben Okafor', 'Platform', 'Doing', 13],
   ['T-301', 'Refresh the icon set', 'Grace Whitfield', 'Design', 'Doing', 5],
   ['T-302', 'Dark theme for the dashboard', 'Grace Whitfield', 'Design', 'Todo', 8],
   ['T-303', 'Empty states for the reports page', 'Ivan Petrov', 'Design', 'Done', 3],
   ['T-304', 'Usability test: new onboarding', 'Ivan Petrov', 'Design', 'Doing', 5],
-  ['T-305', 'Accessibility pass on forms', 'Chloe Marsh', 'Design', 'Todo', 8],
+  ['T-305', 'Accessibility pass on forms: labels, error messages and keyboard order', 'Chloe Marsh', 'Design', 'Todo', 8],
   ['T-306', 'Design tokens handover', 'Grace Whitfield', 'Design', 'Done', 2],
   ['T-307', 'Pricing page mock-ups', 'Ivan Petrov', 'Design', 'Done', 5],
   ['T-308', 'Illustrations for the help centre', 'Jun Takeda', 'Design', 'Todo', 8],
@@ -39,7 +39,7 @@ const tasks = [
   ['T-310', 'Review the email templates', 'Chloe Marsh', 'Design', 'Todo', 3],
   ['T-311', 'Component library audit', 'Grace Whitfield', 'Design', 'Todo', 5],
   ['T-312', 'Motion guidelines', 'Jun Takeda', 'Design', 'Todo', 2],
-  ['T-401', 'Answer the backlog of tickets older than a week', 'Kofi Mensah', 'Support', 'Doing', 8],
+  ['T-401', 'Answer the backlog of support tickets that have been open for longer than a week', 'Kofi Mensah', 'Support', 'Doing', 8],
   ['T-402', 'Write the refund policy macro', 'Lena Fischer', 'Support', 'Done', 2],
   ['T-403', 'Tag tickets by product area', 'Kofi Mensah', 'Support', 'Doing', 3],
   ['T-404', 'Translate the help centre to German', 'Lena Fischer', 'Support', 'Todo', 13],
@@ -57,8 +57,8 @@ const tasks = [
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
 const teams = ['Growth', 'Platform', 'Design', 'Support'];
 
-const taskRow = (r) =>
-  `<tr data-lattice-row="${r.id}"><td>${r.id}</td><td>${esc(r.title)}</td><td>${esc(r.owner)}</td><td>${r.status}</td><td>${r.points}</td></tr>`;
+const taskRow = (r, attrs = '') =>
+  `<tr data-lattice-row="${r.id}"${attrs}><td>${r.id}</td><td>${esc(r.title)}</td><td>${esc(r.owner)}</td><td>${r.team}</td><td>${r.status}</td><td>${r.points}</td></tr>`;
 
 /** The whole view for one team: the picker, and the grid's table inside the element that posts its edits. */
 export function gridFragment(team = '') {
@@ -67,23 +67,35 @@ export function gridFragment(team = '') {
     .map((t) => `<button hx-get="/htmx-demo/grid/tasks?team=${t}" hx-target="#grid-view"
       hx-push-url="${location.pathname}?team=${t}" aria-pressed="${t === team}">${t || 'All teams'}</button>`)
     .join('\n  ');
-  return `<div class="view"><div class="filters">${picker}</div>
+  const action = `<button class="action" hx-get="/htmx-demo/grid/teammate" hx-vals='{"team": "${team}"}' hx-swap="none">A teammate updates a task</button>`;
+  // The anchors sit beside the grid: an out-of-band row lands on the one with its key.
+  const anchors = list.map((r) => `<i id="task-${r.id}" data-lattice-row="${r.id}"></i>`).join('');
+  return `<div class="view"><div class="filters">${picker}\n  ${action}</div>
 <div hx-post="/htmx-demo/grid/save" hx-trigger="lattice:grid-change"
   hx-vals='js:{key: event.detail.key, field: event.detail.field, value: event.detail.newValue}'
   hx-target="#save-log" hx-swap="afterbegin">
 <table id="tasks" data-lattice-grid>
-  <thead><tr><th data-field="id">Ref</th><th data-field="title" data-edit>Task</th><th data-field="owner" data-edit>Owner</th>
-    <th data-field="status" data-edit>Status</th><th data-field="points" data-type="number" data-edit>Points</th></tr></thead>
+  <thead><tr><th data-field="id" data-width="80">Ref</th><th data-field="title" data-edit data-width="440">Task</th>
+    <th data-field="owner" data-edit data-flex="1" data-min-width="150">Owner</th><th data-field="team" data-width="110">Team</th><th data-field="status" data-edit data-width="100">Status</th>
+    <th data-field="points" data-type="number" data-edit data-width="90">Points</th></tr></thead>
   <tbody>
   ${list.map(taskRow).join('\n  ')}
   </tbody>
-</table>
+</table>${anchors}
 </div></div>`;
 }
 
 export const routes = {
   // hx-get: another team's tasks; the old grid is torn down and a new one built.
   'GET /htmx-demo/grid/tasks': ({ params }) => gridFragment(teams.includes(params.team) ? params.team : ''),
+
+  // hx-get with hx-swap="none": a teammate changes the sixth task of the view, which comes back out of band and patches in place.
+  'GET /htmx-demo/grid/teammate': ({ params }) => {
+    const list = teams.includes(params.team) ? tasks.filter((r) => r.team === params.team) : tasks;
+    const row = list[5];
+    row.status = { Todo: 'Doing', Doing: 'Done', Done: 'Todo' }[row.status];
+    return taskRow(row, ` id="task-${row.id}" hx-swap-oob="true"`);
+  },
 
   // hx-post from lattice:grid-change: the key, the field and the new value of the committed cell.
   'POST /htmx-demo/grid/save': ({ params }) => {

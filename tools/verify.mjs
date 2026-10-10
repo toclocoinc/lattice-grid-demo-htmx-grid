@@ -1,10 +1,10 @@
 // Real-Chrome check of the five steps: built on load, an edit posted with hx-post,
 // a sort, a team swap, Back, and no console errors or [lattice] warnings.
 //   npm run serve                    (in another terminal)
-//   CHROME=/usr/bin/google-chrome node tools/verify.mjs [http://localhost:8000/ [width height]]
+//   CHROME=/usr/bin/google-chrome node tools/verify.mjs [http://localhost:8000/lattice-grid-demo-htmx-grid/ [width height]]
 import puppeteer from 'puppeteer-core';
 
-const url = process.argv[2] || 'http://localhost:8000/';
+const url = process.argv[2] || 'http://localhost:8000/lattice-grid-demo-htmx-grid/';
 const [width, height] = [Number(process.argv[3] || 1440), Number(process.argv[4] || 900)];
 const sleep = (ms) => new Promise((r) => { setTimeout(r, ms); });
 const browser = await puppeteer.launch({ executablePath: process.env.CHROME || '/usr/bin/google-chrome', headless: true, args: ['--no-sandbox'] });
@@ -23,6 +23,8 @@ try {
   await page.goto(url);
   await page.waitForFunction(() => document.querySelectorAll('#grid-view [role=row]').length > 3, { timeout: 30000 });
   await sleep(1000);
+  const fill = await page.evaluate(() => { const h = { width: document.querySelector('#tasks').clientWidth }; const c = [...document.querySelectorAll('#grid-view [role=columnheader]')].map((e) => e.getBoundingClientRect()); return { host: h.width, cols: Math.max(...c.map((r) => r.right)) - Math.min(...c.map((r) => r.left)) }; });
+  check(Math.abs(fill.host - fill.cols) <= 4, `grid fills the host (host ${fill.host}px, columns ${fill.cols}px)`);
   check((await page.evaluate(text)).includes('Audit the checkout funnel'), 'built on load from the server task table');
   check(await page.evaluate(() => !document.querySelector('#grid-view table')), 'the table was replaced by the grid');
 
@@ -44,11 +46,16 @@ try {
   await sleep(1500);
   const platform = await page.evaluate(refs);
   check(platform.includes('T-2') && !platform.includes('T-1'), `swap: the other team is built (${platform.slice(0, 40)})`);
+  check(new URL(page.url()).pathname === new URL(url).pathname && page.url().includes('team=Platform'), `swap: history URL is the full page path (${page.url()})`);
   await page.goBack();
   await sleep(2000);
   const back = await page.evaluate(refs);
   check(await page.evaluate(() => document.querySelectorAll('#grid-view [role=grid]').length) === 1, 'Back: the grid is drawn once');
   check(back === sorted, 'Back: the earlier view and its sort return');
+  await page.goForward();
+  await sleep(2000);
+  const fwd = await page.evaluate(refs);
+  check(fwd === platform && page.url().includes('team=Platform'), 'Forward: the team swap returns');
   check(problems.length === 0, `no console errors or [lattice] warnings ${problems.join(' / ')}`);
 } finally {
   await browser.close();

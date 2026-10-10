@@ -65,7 +65,7 @@ export function gridFragment(team = '') {
   const list = team ? tasks.filter((r) => r.team === team) : tasks;
   const picker = ['', ...teams]
     .map((t) => `<button hx-get="/htmx-demo/grid/tasks?team=${t}" hx-target="#grid-view"
-      hx-push-url="?team=${t}" aria-pressed="${t === team}">${t || 'All teams'}</button>`)
+      hx-push-url="${location.pathname}?team=${t}" aria-pressed="${t === team}">${t || 'All teams'}</button>`)
     .join('\n  ');
   return `<div class="view"><div class="filters">${picker}</div>
 <div hx-post="/htmx-demo/grid/save" hx-trigger="lattice:grid-change"

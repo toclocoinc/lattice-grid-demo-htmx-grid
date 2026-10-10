@@ -20,7 +20,7 @@ GitHub Pages is static, so `src/mock-server.js` answers htmx's requests to `/htm
 
 ```
 npm ci
-npm run serve        # http://localhost:8000/
+npm run serve        # http://localhost:8000/lattice-grid-demo-htmx-grid/
 npm run verify       # headless Chrome check of the steps (needs Chrome)
 ```
 

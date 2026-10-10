@@ -18,7 +18,8 @@ const PACKAGE = /https:\/\/cdn\.jsdelivr\.net\/npm\/@toclocoinc\/lattice-grid@[\
 
 export function startServer({ port = 0, localDist = '' } = {}) {
   const server = createServer(async (request, response) => {
-    const path = decodeURIComponent((request.url || '/').split('?')[0]);
+    // Served under the same path as on GitHub Pages, so history URLs behave identically.
+    const path = decodeURIComponent((request.url || '/').split('?')[0]).replace(/^\/lattice-grid-demo-htmx-grid(?=\/|$)/, '') || '/';
     if (localDist && path.startsWith('/__grid/')) {
       return createReadStream(join(localDist, normalize(path.slice(7)))).on('error', () => response.writeHead(404).end('Not found'))
         .once('open', () => response.writeHead(200, { 'content-type': TYPES[extname(path)] || 'text/javascript; charset=utf-8', 'cache-control': 'no-store' }))
@@ -43,5 +44,5 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
   const at = args.indexOf('--local');
   const localDist = at >= 0 ? resolve(args.splice(at, 2)[1]) : '';
   const { port } = await startServer({ port: Number(args[0] || 0), localDist });
-  console.log(`Serving the demo at http://localhost:${port}/` + (localDist ? ` (grid from ${localDist})` : ''));
+  console.log(`Serving the demo at http://localhost:${port}/lattice-grid-demo-htmx-grid/` + (localDist ? ` (grid from ${localDist})` : ''));
 }

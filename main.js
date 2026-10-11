@@ -3,7 +3,7 @@
 // processes the page and fires htmx:load for the server-rendered table, which is
 // what builds the grid. No mount call anywhere.
 import { installMockServer } from './src/mock-server.js';
-import { routes } from './src/server.js';
+import { routes, gridFragment, teams } from './src/server.js';
 
 const HTMX = 'https://cdn.jsdelivr.net/npm/htmx.org@2.0.4/dist/htmx.min.js';
 const HTMX_SRI = 'sha384-HGfztofotfshcF7+8n44JQL2oJmowVChPTg48S+jvZoztPfvwD79OC/LTtG6dMp+';
@@ -18,6 +18,12 @@ const loadScript = (src, attrs = {}) => new Promise((resolve, reject) => {
   s.onerror = () => reject(new Error('could not load ' + src));
   document.head.append(s);
 });
+
+// A real server would answer this URL with the page for its filter. Render that
+// fragment into the page now, before Lattice or htmx have looked at it, so the
+// grid is built once, for the URL's team, with that button pressed.
+const team = new URLSearchParams(location.search).get('team');
+if (teams.includes(team)) document.getElementById('grid-view').innerHTML = gridFragment(team);
 
 installMockServer(routes);
 const lattice = await import('@toclocoinc/lattice-grid/modules/htmx');

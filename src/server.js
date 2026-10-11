@@ -55,7 +55,7 @@ const tasks = [
 
 // SERVER TEMPLATE START
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
-const teams = ['Growth', 'Platform', 'Design', 'Support'];
+export const teams = ['Growth', 'Platform', 'Design', 'Support'];
 
 const taskRow = (r, attrs = '') =>
   `<tr data-lattice-row="${r.id}"${attrs}><td>${r.id}</td><td>${esc(r.title)}</td><td>${esc(r.owner)}</td><td>${r.team}</td><td>${r.status}</td><td>${r.points}</td></tr>`;

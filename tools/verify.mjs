@@ -92,6 +92,42 @@ try {
   const fwd = await page.evaluate(refs);
   check(fwd === platform && page.url().includes('team=Platform'), 'Forward: the team swap returns');
   check(problems.length === 0, `no console errors or [lattice] warnings ${problems.join(' / ')}`);
+
+  // The URL's own filter: opened fresh or reloaded, the page shows that team, built once, with its button pressed.
+  const base = new URL(url).origin + new URL(url).pathname;
+  const state = () => page2.evaluate(() => ({
+    pressed: [...document.querySelectorAll('#grid-view .filters button[aria-pressed=true]')].map((b) => b.textContent),
+    grids: document.querySelectorAll('#grid-view [role=grid]').length,
+    tables: document.querySelectorAll('#grid-view table').length,
+    teams: [...new Set([...document.querySelectorAll('#grid-view [role=row]')].map((r) => r.textContent).filter((t) => /^T-\d+/.test(t)).map((t) => t.match(/(Growth|Platform|Design|Support)/)?.[1]))].sort().join(','),
+  }));
+  const settle = async () => { await page2.waitForFunction(() => document.querySelectorAll('#grid-view [role=row]').length > 3, { timeout: 30000 }); await sleep(1500); };
+  const expect = async (want, what) => {
+    const s = await state();
+    check(s.pressed.length === 1 && s.pressed[0] === (want || 'All teams') && s.grids === 1 && s.tables === 0 && (want ? s.teams === want : s.teams.split(',').length >= 2), `${what}: ${want || 'All teams'} pressed and built (${JSON.stringify(s)})`);
+  };
+  const page2 = await browser.newPage();
+  await page2.setViewport({ width, height });
+  const problems2 = [];
+  page2.on('console', (m) => { if (m.type() === 'error' || m.text().includes('[lattice]')) problems2.push(m.text()); });
+  page2.on('pageerror', (e) => problems2.push(e.message));
+  await page2.goto(base); await settle();
+  await expect('', 'open bare URL');
+  for (const t of ['Growth', 'Platform', 'Design', 'Support']) {
+    await page2.goto(`${base}?team=${t}`); await settle();
+    await expect(t, `open ?team=${t}`);
+    await page2.reload(); await settle();
+    await expect(t, `reload ?team=${t}`);
+  }
+  await page2.goto(base); await settle();
+  await page2.click('button[hx-get*="team=Design"]'); await sleep(1500);
+  await page2.reload(); await settle();
+  check(page2.url().includes('team=Design'), `click then Refresh keeps the URL (${page2.url()})`);
+  await expect('Design', 'click then Refresh');
+  await page2.goBack(); await sleep(2500);
+  check(!page2.url().includes('team=Design'), `Back after Refresh leaves the Design URL (${page2.url()})`);
+  await expect('', 'Back after Refresh');
+  check(problems2.length === 0, `reload checks: no console errors or [lattice] warnings ${problems2.join(' / ')}`);
 } finally {
   await browser.close();
 }

@@ -127,6 +127,22 @@ try {
   await page2.goBack(); await sleep(2500);
   check(!page2.url().includes('team=Design'), `Back after Refresh leaves the Design URL (${page2.url()})`);
   await expect('', 'Back after Refresh');
+  // htmx must start on a fast cached load: after a Growth click, 10 plain reloads (cache kept) all build it.
+  await page2.goto(base); await settle();
+  await page2.click('button[hx-get*="team=Growth"]'); await sleep(1500);
+  let built = 0;
+  for (let i = 1; i <= 10; i += 1) {
+    await page2.reload();
+    try { await page2.waitForFunction(() => [...document.querySelectorAll('#grid-view [role=row]')].some((r) => /^T-\d+/.test(r.textContent)), { timeout: 8000 }); } catch { /* counted below */ }
+    const s = await state();
+    if (process.env.DEBUG_RELOAD) console.log(i, JSON.stringify(s), page2.url());
+    if (s.pressed.length === 1 && s.pressed[0] === 'Growth' && s.grids === 1 && s.tables === 0 && s.teams === 'Growth') built += 1;
+  }
+  check(built === 10, `10 cached reloads after a Growth click: ${built}/10 built with Growth pressed`);
+  await page2.goto(page2.url()); await settle();
+  await expect('Growth', 'navigate to the same URL again');
+  await page2.reload(); await settle();
+  await expect('Growth', 'reload after navigating again');
   check(problems2.length === 0, `reload checks: no console errors or [lattice] warnings ${problems2.join(' / ')}`);
 } finally {
   await browser.close();

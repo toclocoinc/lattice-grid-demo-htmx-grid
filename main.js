@@ -28,6 +28,10 @@ if (teams.includes(team)) document.getElementById('grid-view').innerHTML = gridF
 installMockServer(routes);
 const lattice = await import('@toclocoinc/lattice-grid/modules/htmx');
 lattice.setLicence(LICENCE);
+// htmx 2.0.4 starts on DOMContentLoaded unless readyState is already 'complete'. After the
+// awaited imports above this script can land after DOMContentLoaded and htmx would never
+// start, so wait for the window load event first.
+if (document.readyState !== 'complete') await new Promise((r) => addEventListener('load', r, { once: true }));
 await loadScript(HTMX, { integrity: HTMX_SRI, crossorigin: 'anonymous' });
 
 // The request log: one line per request the stand-in server answered.

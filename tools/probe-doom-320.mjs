@@ -1,0 +1,13 @@
+import puppeteer from 'puppeteer-core';
+const [url, out] = process.argv.slice(2);
+const browser = await puppeteer.launch({ executablePath: '/usr/bin/google-chrome', headless: true, args: ['--no-sandbox'] });
+const page = await browser.newPage(); await page.setViewport({ width: 1600, height: 900 });
+const errs = []; page.on('pageerror', (e) => errs.push(e.message)); page.on('console', (m) => { if (m.type() === 'error') errs.push(m.text().slice(0, 120)); });
+await page.goto(url, { waitUntil: 'networkidle2', timeout: 60000 });
+const btn = await page.$('button'); if (btn) await btn.click();
+await new Promise((r) => setTimeout(r, 5000));
+const t0 = Date.now(); await page.click('[data-res="320x200"]'); await new Promise((r) => setTimeout(r, 8000));
+const m = await page.evaluate(() => { const host = document.getElementById('grid'); return { cells: host.querySelectorAll('.lat-cell').length, rows: host.querySelectorAll('.lat-row').length, box: [Math.round(host.getBoundingClientRect().width), Math.round(host.getBoundingClientRect().height)], overlay: document.getElementById('overlay').innerText }; });
+console.log(JSON.stringify(m), 'ms since click', Date.now() - t0); console.log(errs.join('\n') || '(no errors)');
+await page.screenshot({ path: out });
+await browser.close();

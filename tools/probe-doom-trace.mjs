@@ -1,0 +1,14 @@
+import puppeteer from 'puppeteer-core';
+const [url, res, out] = process.argv.slice(2);
+const browser = await puppeteer.launch({ executablePath: '/usr/bin/google-chrome', headless: true, args: ['--no-sandbox'] });
+const page = await browser.newPage(); await page.setViewport({ width: 1440, height: 800 });
+await page.goto(url, { waitUntil: 'networkidle2', timeout: 60000 });
+const btn = await page.$('button'); if (btn) await btn.click();
+await new Promise((r) => setTimeout(r, 5000));
+await page.click(`[data-res="${res}"]`); await new Promise((r) => setTimeout(r, 3000));
+await page.keyboard.press('Enter'); await new Promise((r) => setTimeout(r, 1500)); await page.keyboard.press('Enter'); await new Promise((r) => setTimeout(r, 2000));
+await page.tracing.start({ path: out, categories: ['devtools.timeline', 'disabled-by-default-devtools.timeline', 'v8.execute', 'blink.user_timing'] });
+await page.keyboard.down('ArrowLeft'); await new Promise((r) => setTimeout(r, 5000)); await page.keyboard.up('ArrowLeft');
+await page.tracing.stop();
+await browser.close();
+console.log('trace saved');

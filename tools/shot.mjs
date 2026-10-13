@@ -1,0 +1,10 @@
+import puppeteer from 'puppeteer-core';
+const [url, out, w, h, full] = process.argv.slice(2);
+const browser = await puppeteer.launch({ executablePath: '/usr/bin/google-chrome', headless: true, args: ['--no-sandbox'] });
+const page = await browser.newPage();
+await page.setViewport({ width: Number(w) || 1440, height: Number(h) || 900 });
+await page.goto(url, { waitUntil: 'networkidle2', timeout: 60000 });
+await new Promise((r) => setTimeout(r, 1500));
+await page.screenshot({ path: out, fullPage: full === 'full' });
+console.log('saved', out);
+await browser.close();

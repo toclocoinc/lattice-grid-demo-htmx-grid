@@ -1,0 +1,12 @@
+import puppeteer from 'puppeteer-core';
+const [url, out] = process.argv.slice(2);
+const browser = await puppeteer.launch({ executablePath: '/usr/bin/google-chrome', headless: true, args: ['--no-sandbox'] });
+const page = await browser.newPage(); await page.setViewport({ width: 1600, height: 900 });
+await page.goto(url, { waitUntil: 'networkidle2', timeout: 60000 });
+const start = await page.$('button#start, button[data-start], button');
+if (start) await start.click();
+await new Promise((r) => setTimeout(r, 6000));
+await page.keyboard.press('Enter'); await new Promise((r) => setTimeout(r, 2500));
+await page.screenshot({ path: out });
+console.log(await page.evaluate(() => (document.querySelector('.overlay, #overlay, [data-overlay]') || document.body).innerText.slice(0, 160)));
+await browser.close();
